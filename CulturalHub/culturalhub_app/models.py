@@ -1,3 +1,4 @@
+from datetime import date
 from django.db import models
 from django_countries.fields import CountryField
 from django.contrib.auth.models import User
@@ -9,11 +10,16 @@ from django.dispatch import receiver
 
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, verbose_name='Login', unique=True)
-    country = CountryField(verbose_name='Country')
-    age = models.IntegerField(verbose_name='Age', default=0)
+    country = CountryField(verbose_name='Country', null=True)
+    birth_year = models.IntegerField(verbose_name='Birth Year', default=2000)
     about = models.TextField(verbose_name='About', null=True, blank=True)
     interests = models.ManyToManyField('Interest', verbose_name='Interests', blank=True, null=True)
     # avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='Avatar')
+
+    @property
+    def age(self):
+        today = date.today()
+        return today.year - self.birth_year
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):

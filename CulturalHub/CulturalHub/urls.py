@@ -16,12 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from culturalhub_app.views import LoginView, RegisterView, MainPageView
+from culturalhub_app.views import (LoginView, RegisterView, MainPageView,
+                                   UserProfileView, UserContentView, UserProfileEditView,
+                                   )
 
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(), name='login'),
     path('register/', RegisterView.as_view(), name='register'),
-    path('main/', MainPageView.as_view(), name='main-page')
+    path('main/', MainPageView.as_view(), name='main-page'),
+    path('user/<int:user_id>/', UserProfileView.as_view(), name='user'),
+    path('category/<str:category>',UserContentView.as_view(), name='categories' ),
+    path('edit/user/<int:user_id>', UserProfileEditView.as_view(), name='edit-user')
 ]

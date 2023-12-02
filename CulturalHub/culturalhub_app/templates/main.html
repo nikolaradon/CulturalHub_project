@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div style="float: right; margin-top: 10px;">
+        {% if user %}
+            <p>Hello, {{ user.username }}!</p>
+            <a href="{% url 'user' user.id %}">Your Profile</a>
+        {% else %}
+            <p>Welcome, guest!</p>
+            <a href="{% url 'login' %}">Log in</a>
+            <a href="{% url 'register' %}">Register</a>
+        {% endif %}
+    </div>
+
+    <a href="{% url 'categories' 'review' %}">{{ review }}</a>
+    <a href="{% url 'categories' 'tips' %}">{{ tip }}</a>
+    <a href="{% url 'categories' 'events' %}">{{ event }}</a>
+{% endblock %}
