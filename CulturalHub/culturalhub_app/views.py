@@ -17,7 +17,7 @@ from django.contrib.auth import logout, authenticate, login
 class LoginView(View):
     def get(self, request):
         if request.user.is_authenticated:
-            messages.error(request, "User already logged in!")
+            messages.error(request, "You are already logged in!")
             return redirect('main-page')
 
         form = AuthenticationForm()
