@@ -2,9 +2,10 @@
 
 {% block content %}
     <div style="float: right; margin-top: 10px;">
-        {% if user %}
+        {% if user.is_authenticated %}
             <p>Hello, {{ user.username }}!</p>
             <a href="{% url 'user' user.id %}">Your Profile</a>
+            <a href="{% url 'logout' %}">Logout</a>
         {% else %}
             <p>Welcome, guest!</p>
             <a href="{% url 'login' %}">Log in</a>

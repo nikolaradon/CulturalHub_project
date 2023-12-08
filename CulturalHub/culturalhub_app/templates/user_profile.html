@@ -2,17 +2,21 @@
 
 {% block content %}
     <h1>{{ user_profile.user.username }} user's profile</h1>
-    <p>Country: {{ user_profile.country }}</p>
+    <p>Name: {{ user_profile.user.get_full_name}}</p>
+    <p>Country: {{ user_profile.get_country_display }}</p>
     <p>Age: {{ user_profile.age }}</p>
     <p>Bio: {{ user_profile.about }}</p>
-    <p>Interests:
+    <p>Interests:<br>
         {% for interest in user_profile.interests.all %}
             <ul>
             <li>{{ interest }}</li>
             </ul>
-
         {% endfor %}
-    <a href="{% url 'edit-user' user_profile.id %}">Edit your profile</a><br>
+
+    {% if user.id == user_profile.user.id %}
+    <a href="{% url 'edit-user' user_profile.user.id %}">Edit your profile</a><br>
+    <a href="{% url 'logout' %}">Logout</a><br>
+    {% endif %}
     <a href="{% url 'main-page' %}">Retun to the main page</a>
     </p>
 {% endblock %}

@@ -8,28 +8,22 @@ fake = Faker()
 
 def generate_sample_data():
     for _ in range(10):
-        try:
-            user = User.objects.create_user(
-                username=fake.user_name(),
-                password=fake.password(),
-                email=fake.email(),
-                first_name=fake.first_name(),
-                last_name=fake.last_name(),
-            )
+        user = User.objects.create_user(
+            username=fake.user_name(),
+            password=fake.password(),
+            email=fake.email(),
+            first_name=fake.first_name(),
+            last_name=fake.last_name(),
+        )
 
-            profile = UserProfile(
-                user=user,
-                age=random.randint(18, 60),
-                country=fake.country_code(),
-                about=fake.paragraph(),
-            )
-            profile.save()
+        UserProfile.objects.filter(
+            user=user).update(
+            birth_year=random.randint(1980, 2000),
+            country=fake.country_code(),
+            about=fake.paragraph(),
+        )
 
-            # Dodawanie zainteresowań
-            interests_count = random.randint(1, 13)
-            profile.interests.set(random.sample(Interest.objects.all(), interests_count))
-
-        except Exception as e:
-            print(f"Error creating user: {e}")
+        interests_count = random.randint(1, 13)
+        user.userprofile.interests.set(random.choices(Interest.objects.all(), k=interests_count))
 
     print("Sample data for users has been created.")

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Edit your data</h1>
+  <form method="post" action="{% url 'edit-user' user.id %}">
+    {% csrf_token %}
+      {{ userprofile.user.first_name }}
+      {{ userprofile.user.last_name }}
+      {{ form.as_p }}
+    <input type="submit" value="Save changes">
+  </form>
+    <a href="{% url 'user' user.id%}">Back to your profile</a><br>
+    <a href="{% url 'main-page' %}">Back to the main page</a>
+
+{% endblock %}

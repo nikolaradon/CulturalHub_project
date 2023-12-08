@@ -10,11 +10,22 @@
         {% load static %}
         <img src="{% static 'logo.png' %}" alt="CulturalHub logo">
     </header>
+
+    {% block messages %}
+        {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endblock %}
+
     {% block content %}
     {% endblock %}
 
     <footer>
-        <p>&copy; 2023 CulturalHub</p>
+        <p>2023 CulturalHub&copy; </p>
     </footer>
 </body>
 </html>
