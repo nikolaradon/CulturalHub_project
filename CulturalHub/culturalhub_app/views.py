@@ -1,14 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import FormView, CreateView, UpdateView
+from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
-from culturalhub_app.models import UserProfile, Category
+from culturalhub_app.models import UserProfile, Category, UserContent
 from culturalhub_app.forms import RegistrationForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import logout, authenticate, login
+from django.contrib.auth import logout, login
 
 
 # Create your views here.
@@ -54,18 +53,12 @@ def logout_view(request):
 
 class MainPageView(View):
     def get(self, request):
-        if request.method == 'GET':
-            event = Category.objects.get(name='Event')
-            tip = Category.objects.get(name='Tip')
-            review = Category.objects.get(name='Place review')
-
-
-            ctx = {
-                'review': review,
-                'tip': tip,
-                'event': event,
-                'user': request.user
-            }
+        categories = Category.objects.all()
+        user = request.user
+        ctx = {
+            'categories': categories,
+            'user': user
+        }
 
         return render(request, 'main.html', ctx)
 
@@ -80,7 +73,6 @@ class UserProfileView(View):
             return redirect('main-page')
 
 
-
 class UserProfileEditView(UpdateView, LoginRequiredMixin):
     model = UserProfile
     fields = ['country', 'birth_year', 'about', 'interests']
@@ -93,7 +85,18 @@ class UserProfileEditView(UpdateView, LoginRequiredMixin):
         return self.request.user.userprofile
 
 
+class CategoryContentView(View):
+    def get(self, request, category):
+        category_obj = Category.objects.get(name=category)
+        contents = UserContent.objects.filter(category__name=category)
 
-class UserContentView(View):
-    def get(self, request):
-        pass
+        ctx = {
+            'contents': contents,
+            'category': category_obj
+        }
+
+        return render(request, 'category_content.html', ctx)
+
+
+class ContentView(View):
+    pass

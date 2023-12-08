@@ -13,7 +13,7 @@
         {% endif %}
     </div>
 
-    <a href="{% url 'categories' 'review' %}">{{ review }}</a>
-    <a href="{% url 'categories' 'tips' %}">{{ tip }}</a>
-    <a href="{% url 'categories' 'events' %}">{{ event }}</a>
+    {% for category in categories %}
+        <a href="{% url 'category' category.name %}">{{ category.name }}</a>
+    {% endfor %}
 {% endblock %}
