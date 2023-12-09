@@ -1,5 +1,6 @@
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
+from django.http import HttpResponse
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import CreateView, UpdateView
@@ -98,5 +99,15 @@ class CategoryContentView(View):
         return render(request, 'category_content.html', ctx)
 
 
+
 class ContentView(View):
-    pass
+    def get(self, request, content_id):
+        try:
+            content = UserContent.objects.get(id=content_id)
+            category = content.category
+            return render(request, 'content.html', {'content': content, 'category': category})
+        except UserContent.DoesNotExist:
+            messages.error(request, 'Content does not exist!')
+            return redirect('main-page')
+
+

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ content.title }}</h1>
+<p>Description: {{ content.description }}</p>
+<p>Date: {{ content.date }}</p>
+<p>Location: {{ content.location }}</p>
+<p>Author: {{ content.author }}</p>
+<p>Rating: {{ content.rating }}</p>
+<p>Culture: {{ content.culture }}</p>
+Related interests: {% for interest in content.interests.all %}
+    <ul>
+    <li>{{ interest }}</li>
+    </ul>
+{% endfor %}
+
+    <a href="{% url 'category' category.name %}">Back to {{ category.name }} category</a><br>
+    <a href="{% url 'main-page' %}">Back to the main page </a>
+
+{% endblock %}
