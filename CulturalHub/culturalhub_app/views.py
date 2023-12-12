@@ -1,17 +1,39 @@
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views import View
 from django.views.generic import CreateView, UpdateView
 from django.urls import reverse_lazy
 from culturalhub_app.models import UserProfile, Category, UserContent
-from culturalhub_app.forms import RegistrationForm
+from culturalhub_app.forms import RegistrationForm, UserProfileForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import logout, login
+from django.contrib.auth import logout, login, authenticate
 
 
 # Create your views here.
+
+
+# class LoginView(View):
+#     def get(self, request):
+#         if request.user.is_authenticated:
+#             messages.error(request, "You are already logged in!")
+#             return redirect('main-page')
+#
+#         form = AuthenticationForm()
+#         return render(request, 'login.html', {'form': form})
+#
+#     def post(self, request):
+#         form = AuthenticationForm(request.POST)
+#         if form.is_valid():
+#             user = form.get_user()
+#             login(request, user)
+#             print(f"User {user.username} logged in successfully.")
+#             return redirect('main-page')
+#         else:
+#             # print("Invalid login attempt. Form errors:", form.errors)
+#             pass
+#         return render(request, 'login.html', {'form': form})
 
 
 class LoginView(View):
@@ -20,19 +42,22 @@ class LoginView(View):
             messages.error(request, "You are already logged in!")
             return redirect('main-page')
 
-        form = AuthenticationForm()
-        return render(request, 'login.html', {'form': form})
+        return render(request, 'login.html')
 
     def post(self, request):
-        form = AuthenticationForm(data=request.POST)
-        if form.is_valid():
-            user = form.get_user()
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+
+        user = authenticate(request, username=username, password=password)
+
+        if user is not None:
             login(request, user)
-            print(f"User {user.username} logged in successfully.")
+            messages.success(request, f"User {user.username} logged in successfully.")
             return redirect('main-page')
         else:
-            print("Invalid login attempt. Form errors:", form.errors)
-        return render(request, 'login.html', {'form': form})
+            messages.error(request, "Invalid login credentials. Please try again.")
+
+        return render(request, 'login.html')
 
 
 class RegisterView(CreateView):
@@ -74,30 +99,46 @@ class UserProfileView(View):
             return redirect('main-page')
 
 
-class UserProfileEditView(UpdateView, LoginRequiredMixin):
-    model = UserProfile
-    fields = ['country', 'birth_year', 'about', 'interests']
-    template_name = 'user_profile_edit.html'
+class UserProfileEditView(View, LoginRequiredMixin):
+    def get(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            user_profile = request.user.userprofile
+            form = UserProfileForm(instance=user_profile)
+            return render(request, 'user_profile_edit.html', {'user_profile': user_profile, 'form': form})
+        else:
+            return redirect('login')
 
-    def get_success_url(self):
-        return reverse_lazy('user', kwargs={'user_id': self.object.user.id})
+    def post(self, request, *args, **kwargs):
+        if request.user.is_authenticated:
+            user_profile = request.user.userprofile
+            form = UserProfileForm(request.POST, instance=user_profile)
 
-    def get_object(self):
-        return self.request.user.userprofile
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Profile has been updated successfully.")
+                return redirect('user', user_id=request.user.id)
+            else:
+                return render(request, 'user_profile_edit.html', {'user_profile': user_profile, 'form': form})
+        else:
+            return redirect('login')
 
 
 class CategoryContentView(View):
     def get(self, request, category):
-        category_obj = Category.objects.get(name=category)
-        contents = UserContent.objects.filter(category__name=category)
+        try:
+            category_obj = Category.objects.get(name=category)
+            contents = UserContent.objects.filter(category__name=category)
 
-        ctx = {
-            'contents': contents,
-            'category': category_obj
-        }
+            ctx = {
+                'contents': contents,
+                'category': category_obj
+            }
 
-        return render(request, 'category_content.html', ctx)
+            return render(request, 'category_content.html', ctx)
 
+        except Category.DoesNotExist:
+            messages.error(request, "Category does not exist!")
+            return redirect('main-page')
 
 
 class ContentView(View):
@@ -105,9 +146,27 @@ class ContentView(View):
         try:
             content = UserContent.objects.get(id=content_id)
             category = content.category
-            return render(request, 'content.html', {'content': content, 'category': category})
+
+            ctx = {
+                'content': content,
+                'category': category
+            }
+            return render(request, 'content.html', ctx)
         except UserContent.DoesNotExist:
             messages.error(request, 'Content does not exist!')
             return redirect('main-page')
 
+
+class ContentCreateView(LoginRequiredMixin, CreateView):
+    model = UserContent
+    fields = ['title', 'description', 'date', 'location', 'category', 'interests', 'culture', 'rating']
+    template_name = 'create_content.html'
+    login_url = 'login'
+
+    def form_valid(self, form):
+        content = form.save(commit=False)
+        content.author = self.request.user.userprofile
+        content.save()
+        category_name = content.category.name
+        return HttpResponseRedirect(reverse_lazy('category', kwargs={'category': category_name}))
 

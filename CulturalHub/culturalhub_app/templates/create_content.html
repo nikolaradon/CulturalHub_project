@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Add things you want to share with the community!</h1>
+  <form method="post" action="{% url 'create-content' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Add!">
+  </form>
+
+
+    <a href="{% url 'main-page' %}">Back to the main page</a>
+
+{% endblock %}

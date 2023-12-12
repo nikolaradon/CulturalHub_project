@@ -4,10 +4,19 @@
 
 <h1>{{ content.title }}</h1>
 <p>Description: {{ content.description }}</p>
-<p>Date: {{ content.date }}</p>
+    {% if content.category.name == 'Event' %}
+        <p>Date of event: {{ content.date }}</p>
+    {% else %}
+        <p>Date of creation: {{ content.date }}</p>
+    {% endif %}
 <p>Location: {{ content.location }}</p>
 <p>Author: {{ content.author }}</p>
-<p>Rating: {{ content.rating }}</p>
+<p>Rating: {% if content.rating is None %}
+                 -
+            {% else %}
+                {{ content.rating }}
+            {% endif %}
+</p>
 <p>Culture: {{ content.culture }}</p>
 Related interests: {% for interest in content.interests.all %}
     <ul>
