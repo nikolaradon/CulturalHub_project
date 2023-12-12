@@ -1,9 +1,8 @@
 from django.contrib import messages
-from django.contrib.auth.forms import AuthenticationForm
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views import View
-from django.views.generic import CreateView, UpdateView
+from django.views.generic import CreateView
 from django.urls import reverse_lazy
 from culturalhub_app.models import UserProfile, Category, UserContent
 from culturalhub_app.forms import RegistrationForm, UserProfileForm
@@ -37,7 +36,22 @@ from django.contrib.auth import logout, login, authenticate
 
 
 class LoginView(View):
+    """
+    Class-based view for user authentication and login.
+
+    Methods:
+        get(request): Renders the login page for GET requests.
+        post(request): Handles user login attemps for POST requests.
+    """
     def get(self, request):
+        """
+        Handles GET requests for the login page.
+        If the user is already authenticated, redirects to the main page.
+        If not authenticated, renders the login page.
+
+        :param request: HttpRequest object.
+        :return: HttpResponse object.
+        """
         if request.user.is_authenticated:
             messages.error(request, "You are already logged in!")
             return redirect('main-page')
@@ -45,6 +59,14 @@ class LoginView(View):
         return render(request, 'login.html')
 
     def post(self, request):
+        """
+        Handles POST requests for user login.
+        Authenticates the user based on provided credentials.
+        If login is successful, redirects to the main page with a success message.
+    If login fails, displays an error message and renders the login page.
+        :param request: HttpRequest object.
+        :return: HttpResponse object.
+        """
         username = request.POST.get('username')
         password = request.POST.get('password')
 
