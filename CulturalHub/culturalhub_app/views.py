@@ -40,8 +40,8 @@ class LoginView(View):
     Class-based view for user authentication and login.
 
     Methods:
-        get(request): Renders the login page for GET requests.
-        post(request): Handles user login attemps for POST requests.
+        1. get(request): Renders the login page for GET requests.
+        2. post(request): Handles user login attemps for POST requests.
     """
     def get(self, request):
         """
@@ -63,7 +63,8 @@ class LoginView(View):
         Handles POST requests for user login.
         Authenticates the user based on provided credentials.
         If login is successful, redirects to the main page with a success message.
-    If login fails, displays an error message and renders the login page.
+        If login fails, displays an error message and renders the login page.
+
         :param request: HttpRequest object.
         :return: HttpResponse object.
         """
@@ -83,12 +84,34 @@ class LoginView(View):
 
 
 class RegisterView(CreateView):
+    """
+    View uses Django's built-in CreateView to handle user registration.
+    It renders a registration form using the RegistrationForm and creates a new UserProfile upon successful form submission.
+
+    Attributes:
+        model (UserProfile): The model used for creating a new user profile.
+        form_class (RegistrationForm): The form class responsible for handling user registration data.
+        template_name (str): The name of the template used for rendering the registration page.
+        success_url (str): The URL to redirect to upon successful user registration.
+
+        Methods:
+        form_valid(form): Overrides the form_valid method to add a success message upon successful registration.
+    """
     model = UserProfile
     form_class = RegistrationForm
     template_name = 'register.html'
     success_url = reverse_lazy('login')
 
     def form_valid(self, form):
+        """
+        Process a valid form submission.
+
+        Overrides the form_valid method to perform additional actions upon successful registration.
+        In this case, it adds a success message to the request and calls the parent class's form_valid method.
+
+        :param form: RegistrationForm object.
+        :return: HttpResponse object.
+        """
         response = super().form_valid(form)
         messages.success(self.request, "Profile has been successfully created. Please log in.")
         return response
