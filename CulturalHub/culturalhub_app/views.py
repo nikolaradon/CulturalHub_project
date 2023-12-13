@@ -130,7 +130,22 @@ def logout_view(request):
 
 
 class MainPageView(View):
+    """
+    Class-based view for rendering the main page.
+
+    Methods:
+        get(request): Renders GET requests for the main page
+    """
     def get(self, request):
+        """
+        Handles GET requests for the main page.
+        Retrieves all categories from the database.
+        Fetches the current user from the request.
+        Renders the 'main.html' template with the categories and user information.
+
+        :param request: HttpRequest object.
+        :return: HttpResponse object.
+        """
         categories = Category.objects.all()
         user = request.user
         ctx = {
