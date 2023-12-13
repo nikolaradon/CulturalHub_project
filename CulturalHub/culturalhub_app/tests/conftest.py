@@ -1,8 +1,6 @@
 import pytest
 from django.test import Client
 from django.contrib.auth.models import User
-from django.urls import reverse
-
 from culturalhub_app.forms import RegistrationForm
 
 
@@ -14,20 +12,6 @@ def client():
 @pytest.fixture
 def user():
     return User.objects.create_user(username='testuser', password='testpassword')
-
-
-@pytest.fixture
-def login_data():
-    return {
-        'username': 'testuser',
-        'password': 'testpassword'
-    }
-
-
-@pytest.fixture
-def login_user(client, user, login_data):
-    client.post(reverse('login'), login_data)
-    return user
 
 
 @pytest.fixture

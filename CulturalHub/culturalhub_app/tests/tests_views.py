@@ -44,3 +44,17 @@ def test_register_view_invalid_registration(client, invalid_registration_data):
         User.objects.get(username=invalid_registration_data['username'])
 
 
+def test_logout_view(client, user):
+    client.force_login(user)
+    response = client.get(reverse('logout'))
+    assert response.status_code == 302
+    assert response.url == reverse('login')
+    assert not response.wsqi_request.user.is_authenticated
+
+
+def test_logout_view_unauthenticated_user(client):
+    response = client.get(reverse('logout'))
+    assert response.status_code == 302
+    assert response.url == reverse('login')
+
+

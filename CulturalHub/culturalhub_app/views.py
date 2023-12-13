@@ -118,6 +118,13 @@ class RegisterView(CreateView):
 
 
 def logout_view(request):
+    """
+    View for logging a user out.
+    This view uses Django's `logout` function to log the user out and then redirects them to the login page.
+
+    :param request: HttpRequest object.
+    :return: HttpResponse object.
+    """
     logout(request)
     return redirect('login')
 
