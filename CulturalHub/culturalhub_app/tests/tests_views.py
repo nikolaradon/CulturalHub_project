@@ -58,3 +58,15 @@ def test_logout_view_unauthenticated_user(client):
     assert response.url == reverse('login')
 
 
+def test_main_page_view_user_info(client, user):
+    client.force_login(user)
+    response = client.get(reverse('main-page'))
+    assert response.status_code == 200
+    assert 'user' in response.context
+    assert response.context['user'] == user
+
+
+def test_main_page_view_rendering(client):
+    response = client.get(reverse('main-page'))
+    assert response.status_code == 200
+    assert 'main.html' in [template.name for template in response.templates]
