@@ -50,15 +50,6 @@ class RegisterView(CreateView):
     """
     View uses Django's built-in CreateView to handle user registration.
     It renders a registration form using the RegistrationForm and creates a new UserProfile upon successful form submission.
-
-    Attributes:
-        model (UserProfile): The model used for creating a new user profile.
-        form_class (RegistrationForm): The form class responsible for handling user registration data.
-        template_name (str): The name of the template used for rendering the registration page.
-        success_url (str): The URL to redirect to upon successful user registration.
-
-        Methods:
-        form_valid(form): Overrides the form_valid method to add a success message upon successful registration.
     """
     model = UserProfile
     form_class = RegistrationForm

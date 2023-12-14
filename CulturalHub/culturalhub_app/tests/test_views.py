@@ -17,19 +17,19 @@ def test_login_view_authenticated_user(client, user):
 def test_login_view_invalid_credentials(client):
     response = client.post(reverse('login'), {'username': 'testuser', 'password': 'invalidpassword'})
     assert response.status_code == 200
-    assert 'Invalid login attempt.' in response.content.decode('utf-8')
-#
-#
-# @pytest.mark.django_db
-# def test_register_view_successful_registration(client, valid_registration_data):
-#     response = client.post(reverse('register'), valid_registration_data)
-#     assert response.status_code == 200
-#     assert 'Profile has been successfully created. Please log in.' in response.text
-#
-#     user = User.objects.get(username=valid_registration_data['username'])
-#     assert user is not None
-#
-#     assert UserProfile.objects.filter(user=user).exists()
+    assert b'Please enter a correct username and password' in response.content
+
+
+@pytest.mark.django_db
+def test_register_view_successful_registration(client, valid_registration_data):
+    response = client.post(reverse('register'), valid_registration_data)
+    assert response.status_code == 302
+    assert response.url == reverse('login')
+
+    user = User.objects.get(username=valid_registration_data['username'])
+    assert user is not None
+
+    assert UserProfile.objects.filter(user=user).exists()
 #
 #
 # @pytest.mark.django_db
