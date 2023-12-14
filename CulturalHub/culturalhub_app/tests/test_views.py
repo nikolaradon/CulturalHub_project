@@ -30,18 +30,15 @@ def test_register_view_successful_registration(client, valid_registration_data):
     assert user is not None
 
     assert UserProfile.objects.filter(user=user).exists()
-#
-#
-# @pytest.mark.django_db
-# def test_register_view_invalid_registration(client, invalid_registration_data):
-#     response = client.post(reverse('register'), invalid_registration_data)
-#
-#     assert response.status_code == 200
-#     assert 'Please correct the errors below' in response.text
-#     assert "The two password fields didn't match" in response.text
-#
-#     with pytest.raises(ObjectDoesNotExist):
-#         User.objects.get(username=invalid_registration_data['username'])
+
+
+@pytest.mark.django_db
+def test_register_view_invalid_registration(client, invalid_registration_data):
+    response = client.post(reverse('register'), invalid_registration_data)
+    assert response.status_code == 200
+
+    with pytest.raises(ObjectDoesNotExist):
+        User.objects.get(username=invalid_registration_data['username'])
 #
 #
 # def test_logout_view(client, user):
