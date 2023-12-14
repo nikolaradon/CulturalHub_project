@@ -1,4 +1,5 @@
 from django.contrib import messages
+from django.contrib.auth.forms import AuthenticationForm
 from django.http import HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.views import View
@@ -13,74 +14,40 @@ from django.contrib.auth import logout, login, authenticate
 # Create your views here.
 
 
-# class LoginView(View):
-#     def get(self, request):
-#         if request.user.is_authenticated:
-#             messages.error(request, "You are already logged in!")
-#             return redirect('main-page')
-#
-#         form = AuthenticationForm()
-#         return render(request, 'login.html', {'form': form})
-#
-#     def post(self, request):
-#         form = AuthenticationForm(request.POST)
-#         if form.is_valid():
-#             user = form.get_user()
-#             login(request, user)
-#             print(f"User {user.username} logged in successfully.")
-#             return redirect('main-page')
-#         else:
-#             # print("Invalid login attempt. Form errors:", form.errors)
-#             pass
-#         return render(request, 'login.html', {'form': form})
-
-
 class LoginView(View):
     """
     Class-based view for user authentication and login.
-
-    Methods:
-        1. get(request): Renders the login page for GET requests.
-        2. post(request): Handles user login attemps for POST requests.
     """
     def get(self, request):
         """
-        Handles GET requests for the login page.
-        If the user is already authenticated, redirects to the main page.
-        If not authenticated, renders the login page.
-
-        :param request: HttpRequest object.
-        :return: HttpResponse object.
+        Checks if the user is already authenticated.
+        If authenticated, it redirects to the main page with an error message.
+        If not authenticated, it renders the login page with an empty authentication form.
         """
         if request.user.is_authenticated:
             messages.error(request, "You are already logged in!")
             return redirect('main-page')
 
-        return render(request, 'login.html')
+        form = AuthenticationForm()
+        return render(request, 'login.html', {'form': form})
 
     def post(self, request):
         """
-        Handles POST requests for user login.
-        Authenticates the user based on provided credentials.
-        If login is successful, redirects to the main page with a success message.
-        If login fails, displays an error message and renders the login page.
-
-        :param request: HttpRequest object.
-        :return: HttpResponse object.
+        Validates the login form using the AuthenticationForm.
+        If the form is valid, it retrieves the user, logs them in and redirects to the main page
+        If the form is invalid does not proceed with login, renders the login page with the authentication form and error messages.
         """
-        username = request.POST.get('username')
-        password = request.POST.get('password')
-
-        user = authenticate(request, username=username, password=password)
-
-        if user is not None:
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            user = form.get_user()
             login(request, user)
-            messages.success(request, f"User {user.username} logged in successfully.")
+            print(f"User {user.username} logged in successfully.")
             return redirect('main-page')
         else:
-            messages.error(request, "Invalid login credentials. Please try again.")
+            print("Invalid login attempt. Form errors:", form.errors)
+            pass
+        return render(request, 'login.html', {'form': form})
 
-        return render(request, 'login.html')
 
 
 class RegisterView(CreateView):
@@ -157,7 +124,20 @@ class MainPageView(View):
 
 
 class UserProfileView(View):
+    """
+    View for displaying user profiles
+
+    Methods:
+        get(request, user_id): Handles GET requests for user profile details.
+    """
     def get(self, request, user_id):
+        """
+        Handles GET requests for user profile details.
+
+        :param request: HttpRequest object.
+        :param user_id: ID of the user profile to display.
+        :return: HttpResponse object.
+        """
         try:
             user_profile = UserProfile.objects.get(user=user_id)
             return render(request, 'user_profile.html', {'user_profile': user_profile})
@@ -170,7 +150,8 @@ class UserProfileEditView(View, LoginRequiredMixin):
     def get(self, request, *args, **kwargs):
         if request.user.is_authenticated:
             user_profile = request.user.userprofile
-            form = UserProfileForm(instance=user_profile)
+            form = UserProfileForm(instance=user_profile, initial = {'first_name':request.user.first_name, 'last_name': request.user.last_name})
+
             return render(request, 'user_profile_edit.html', {'user_profile': user_profile, 'form': form})
         else:
             return redirect('login')
@@ -181,6 +162,9 @@ class UserProfileEditView(View, LoginRequiredMixin):
             form = UserProfileForm(request.POST, instance=user_profile)
 
             if form.is_valid():
+                request.user.first_name = form.cleaned_data['first_name']
+                request.user.last_name = form.cleaned_data['last_name']
+                request.user.save()
                 form.save()
                 messages.success(request, "Profile has been updated successfully.")
                 return redirect('user', user_id=request.user.id)

@@ -43,3 +43,10 @@ class UserProfileForm(forms.ModelForm):
     class Meta:
         model = UserProfile
         fields = ['country', 'birth_year', 'about', 'interests']
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['first_name'] = forms.CharField(max_length=64)
+        self.fields['last_name'] = forms.CharField(max_length=64)
+
+
