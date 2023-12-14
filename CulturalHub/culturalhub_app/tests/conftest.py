@@ -1,7 +1,10 @@
+import random
+
 import pytest
 from django.test import Client
 from django.contrib.auth.models import User
 from culturalhub_app.forms import RegistrationForm
+from culturalhub_app.models import UserProfile
 
 
 @pytest.fixture
@@ -12,6 +15,26 @@ def client():
 @pytest.fixture
 def user():
     return User.objects.create_user(username='testuser', password='testpassword')
+
+
+@pytest.fixture
+def create_user_profile(user):
+    user_profile, created = UserProfile.objects.get_or_create(
+        user=user,
+        defaults={'country': 'US', 'birth_year': 1990, 'about': 'Test about'}
+    )
+    if not created:
+        return user_profile
+
+    return UserProfile.objects.get(user=user)
+
+
+@pytest.fixture()
+def generate_non_existing_user_id():
+    while True:
+        user_id = random.randint(1, 1000000)
+        if not User.objects.filter(id=user_id).exists():
+            return user_id
 
 
 @pytest.fixture

@@ -8,7 +8,7 @@ from django.urls import reverse_lazy
 from culturalhub_app.models import UserProfile, Category, UserContent
 from culturalhub_app.forms import RegistrationForm, UserProfileForm
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.contrib.auth import logout, login, authenticate
+from django.contrib.auth import logout, login
 
 
 # Create your views here.
@@ -75,9 +75,6 @@ def logout_view(request):
     """
     View for logging a user out.
     This view uses Django's `logout` function to log the user out and then redirects them to the login page.
-
-    :param request: HttpRequest object.
-    :return: HttpResponse object.
     """
     logout(request)
     return redirect('login')
@@ -86,9 +83,6 @@ def logout_view(request):
 class MainPageView(View):
     """
     Class-based view for rendering the main page.
-
-    Methods:
-        get(request): Renders GET requests for the main page
     """
     def get(self, request):
         """
@@ -96,9 +90,6 @@ class MainPageView(View):
         Retrieves all categories from the database.
         Fetches the current user from the request.
         Renders the 'main.html' template with the categories and user information.
-
-        :param request: HttpRequest object.
-        :return: HttpResponse object.
         """
         categories = Category.objects.all()
         user = request.user
@@ -113,17 +104,12 @@ class MainPageView(View):
 class UserProfileView(View):
     """
     View for displaying user profiles
-
-    Methods:
-        get(request, user_id): Handles GET requests for user profile details.
     """
     def get(self, request, user_id):
         """
         Handles GET requests for user profile details.
 
-        :param request: HttpRequest object.
         :param user_id: ID of the user profile to display.
-        :return: HttpResponse object.
         """
         try:
             user_profile = UserProfile.objects.get(user=user_id)
@@ -134,7 +120,16 @@ class UserProfileView(View):
 
 
 class UserProfileEditView(View, LoginRequiredMixin):
-    def get(self, request, *args, **kwargs):
+    """
+    View responsible for editing a user profile.
+    This view requires authentication, meaning that only logged-in users can edit their profiles.
+    """
+    def get(self, request):
+        """
+        Handles GET requests, checking if the user is logged in.
+        If so, it retrieves the user profile and creates a UserProfileForm filled with profile data and user-related data (first name and last name).
+        If the user is not logged in, it redirects them to the login page (login)
+        """
         if request.user.is_authenticated:
             user_profile = request.user.userprofile
             form = UserProfileForm(instance=user_profile, initial = {'first_name':request.user.first_name, 'last_name': request.user.last_name})
@@ -143,7 +138,12 @@ class UserProfileEditView(View, LoginRequiredMixin):
         else:
             return redirect('login')
 
-    def post(self, request, *args, **kwargs):
+    def post(self, request):
+        """
+        Handles POST requests, which are used to save changes made in the profile editing form.
+        If the form is valid, it saves the changes to the user profile and redirects them to their profile page.
+        If the form is not valid, it re-renders the profile editing page with errors.
+        """
         if request.user.is_authenticated:
             user_profile = request.user.userprofile
             form = UserProfileForm(request.POST, instance=user_profile)

@@ -39,31 +39,42 @@ def test_register_view_invalid_registration(client, invalid_registration_data):
 
     with pytest.raises(ObjectDoesNotExist):
         User.objects.get(username=invalid_registration_data['username'])
-#
-#
-# def test_logout_view(client, user):
-#     client.force_login(user)
-#     response = client.get(reverse('logout'))
-#     assert response.status_code == 302
-#     assert response.url == reverse('login')
-#     assert not response.wsqi_request.user.is_authenticated
-#
-#
-# def test_logout_view_unauthenticated_user(client):
-#     response = client.get(reverse('logout'))
-#     assert response.status_code == 302
-#     assert response.url == reverse('login')
-#
-#
-# def test_main_page_view_user_info(client, user):
-#     client.force_login(user)
-#     response = client.get(reverse('main-page'))
-#     assert response.status_code == 200
-#     assert 'user' in response.context
-#     assert response.context['user'] == user
-#
-#
-# def test_main_page_view_rendering(client):
-#     response = client.get(reverse('main-page'))
-#     assert response.status_code == 200
-#     assert 'main.html' in [template.name for template in response.templates]
+
+
+@pytest.mark.django_db
+def test_logout_view(client, user):
+    client.force_login(user)
+    response = client.get(reverse('logout'))
+    assert response.status_code == 302
+    assert response.url == reverse('login')
+    assert not response.wsgi_request.user.is_authenticated
+
+
+@pytest.mark.django_db
+def test_logout_view_unauthenticated_user(client):
+    response = client.get(reverse('logout'))
+    assert response.status_code == 302
+    assert response.url == reverse('login')
+
+
+@pytest.mark.django_db
+def test_main_page_view_user_info(client, user):
+    client.force_login(user)
+    response = client.get(reverse('main-page'))
+    assert response.status_code == 200
+    assert 'user' in response.context
+    assert response.context['user'] == user
+
+
+@pytest.mark.django_db
+def test_user_profile_view_user_exists(client, create_user_profile):
+    response = client.get(reverse('user', args=[create_user_profile.user.id]))
+    assert response.status_code == 200
+
+
+@pytest.mark.django_db
+def test_user_profile_view_user_doesnt_exist(client, create_user_profile, generate_non_existing_user_id):
+    non_existing_user_id = generate_non_existing_user_id
+    response = client.get(reverse('user', args=[non_existing_user_id]))
+    assert response.status_code == 302
+    assert response.url == reverse('main-page')
