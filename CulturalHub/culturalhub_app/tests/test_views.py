@@ -1,8 +1,9 @@
 import pytest
+from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
-from culturalhub_app.models import UserProfile
+from culturalhub_app.models import UserProfile, Category, UserContent
 
 
 @pytest.mark.django_db
@@ -78,3 +79,32 @@ def test_user_profile_view_user_doesnt_exist(client, create_user_profile, genera
     response = client.get(reverse('user', args=[non_existing_user_id]))
     assert response.status_code == 302
     assert response.url == reverse('main-page')
+
+
+@pytest.mark.django_db
+def test_category_content_view(client, create_test_category, create_test_category_with_content):
+    category = create_test_category
+    content1, content2 = create_test_category_with_content
+
+    response = client.get(reverse('category', kwargs={'category': category}), follow=True)
+
+    assert response.status_code == 200
+    assert 'category' in response.context
+    assert 'contents' in response.context
+    assert response.context['category'] == category
+    assert list(response.context['contents']) == [content1, content2]
+
+
+@pytest.mark.django_db
+def test_content_view_existing_content(client, create_test_category, create_test_category_with_content):
+    category = create_test_category
+    content1, content2 = create_test_category_with_content
+
+    response = client.get(reverse('content-view', kwargs={'content_id': content1.id}), follow=True)
+
+    assert response.status_code == 200
+    assert 'content' in response.context
+    assert 'category' in response.context
+    assert response.context['content'] == content1
+    assert response.context['category'] == category
+

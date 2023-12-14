@@ -132,7 +132,7 @@ class UserProfileEditView(View, LoginRequiredMixin):
         """
         if request.user.is_authenticated:
             user_profile = request.user.userprofile
-            form = UserProfileForm(instance=user_profile, initial = {'first_name':request.user.first_name, 'last_name': request.user.last_name})
+            form = UserProfileForm(instance=user_profile, initial={'first_name': request.user.first_name, 'last_name': request.user.last_name})
 
             return render(request, 'user_profile_edit.html', {'user_profile': user_profile, 'form': form})
         else:
@@ -162,7 +162,17 @@ class UserProfileEditView(View, LoginRequiredMixin):
 
 
 class CategoryContentView(View):
+    """
+    view responsible for handling GET requests to display contents belonging to a specific category.
+    It retrieves the category object based on the provided category name and fetches all associated user contents.
+    """
     def get(self, request, category):
+        """
+        Handles GET requests for displaying contents of a specific category.
+        If the specified category does not exist, it adds an error message and redirects the user to the main page.
+
+        :param category: The name of the category to retrieve and display contents.
+        """
         try:
             category_obj = Category.objects.get(name=category)
             contents = UserContent.objects.filter(category__name=category)
@@ -180,7 +190,16 @@ class CategoryContentView(View):
 
 
 class ContentView(View):
+    """
+    View is responsible for displaying detailed information about a specific content item.
+    It retrieves the content with the given content_id from the database and renders the details along with its associated category.
+    """
     def get(self, request, content_id):
+        """
+        Handles GET requests for displaying detailed information about a specific content item.
+        If the content does not exist, it shows an error message and redirects the user to the main page.
+        :param content_id: ID of the content to display.
+        """
         try:
             content = UserContent.objects.get(id=content_id)
             category = content.category
@@ -196,12 +215,22 @@ class ContentView(View):
 
 
 class ContentCreateView(LoginRequiredMixin, CreateView):
+    """
+    View for creating new content.
+    This view requires users to be logged in, as indicated by the LoginRequiredMixin.
+    """
     model = UserContent
     fields = ['title', 'description', 'date', 'location', 'category', 'interests', 'culture', 'rating']
     template_name = 'create_content.html'
     login_url = 'login'
 
     def form_valid(self, form):
+        """
+        Handles a valid form submission.
+        This method is called when the form is successfully validated. It saves the content object to the database
+        and assigns the current user's UserProfile as the author. After saving, it redirects the user to the category
+        page associated with the created content.
+        """
         content = form.save(commit=False)
         content.author = self.request.user.userprofile
         content.save()

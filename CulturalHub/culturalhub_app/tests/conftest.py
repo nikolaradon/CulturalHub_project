@@ -4,7 +4,7 @@ import pytest
 from django.test import Client
 from django.contrib.auth.models import User
 from culturalhub_app.forms import RegistrationForm
-from culturalhub_app.models import UserProfile
+from culturalhub_app.models import UserProfile, Category, UserContent
 
 
 @pytest.fixture
@@ -69,3 +69,18 @@ def registration_form_data(valid_registration_data):
         'birth_year': valid_registration_data['birth_year'],
     }
     return RegistrationForm(data=form_data)
+
+
+@pytest.fixture
+def create_test_category():
+    return Category.objects.create(name='Test')
+
+
+@pytest.fixture
+def create_test_category_with_content(create_user_profile, create_test_category):
+    user_profile = create_user_profile
+    category = create_test_category
+    content1 = UserContent.objects.create(title='content1', category=category, author=user_profile)
+    content2 = UserContent.objects.create(title='content2', category=category, author=user_profile)
+
+    return content1, content2
