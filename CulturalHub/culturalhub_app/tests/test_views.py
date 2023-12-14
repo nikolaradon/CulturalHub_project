@@ -9,15 +9,15 @@ from culturalhub_app.models import UserProfile
 def test_login_view_authenticated_user(client, user):
     client.force_login(user)
     response = client.get(reverse('login'))
-    assert response.status.code == 302
+    assert response.status_code == 302
     assert response.url == reverse('main-page')
 
 
-# @pytest.mark.django_db
-# def test_login_view_invalid_credentials(client):
-#     response = client.post(reverse('login'), {'username': 'testuser', 'password': 'invalidpassword'})
-#     assert response.status_code == 200
-#     assert 'Invalid login credentials. Please try again.' in response.text
+@pytest.mark.django_db
+def test_login_view_invalid_credentials(client):
+    response = client.post(reverse('login'), {'username': 'testuser', 'password': 'invalidpassword'})
+    assert response.status_code == 200
+    assert 'Invalid login attempt.' in response.content.decode('utf-8')
 #
 #
 # @pytest.mark.django_db

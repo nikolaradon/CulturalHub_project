@@ -43,11 +43,7 @@ class LoginView(View):
             login(request, user)
             print(f"User {user.username} logged in successfully.")
             return redirect('main-page')
-        else:
-            print("Invalid login attempt. Form errors:", form.errors)
-            pass
         return render(request, 'login.html', {'form': form})
-
 
 
 class RegisterView(CreateView):
