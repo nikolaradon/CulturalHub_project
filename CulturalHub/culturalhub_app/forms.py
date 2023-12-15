@@ -6,6 +6,10 @@ from .models import UserProfile
 
 
 class RegistrationForm(UserCreationForm):
+    """
+    The RegistrationForm is a custom form class that inherits from UserCreationForm provided by Django.
+    It extends the base form to include additional fields and custom validation.
+    """
     birth_year = forms.IntegerField(label='Year of birth')
 
     class Meta:
@@ -27,6 +31,11 @@ class RegistrationForm(UserCreationForm):
         return email
 
     def save(self, commit=True):
+        """
+        Overrides the save method to include additional logic.
+        Saves the user instance and associates a UserProfile instance with the user.
+        Performs additional validation before saving.
+        """
         user = super().save(commit=False)
         user.full_clean()
 
@@ -45,6 +54,10 @@ class UserProfileForm(forms.ModelForm):
         fields = ['country', 'birth_year', 'about', 'interests']
 
     def __init__(self, *args, **kwargs):
+        """
+        Overrides the default __init__ method to include additional fields (first_name and last_name) not present in the UserProfile model.
+        This form is designed to be used in conjunction with the User and UserProfile models for user registration and profile editing.
+        """
         super().__init__(*args, **kwargs)
         self.fields['first_name'] = forms.CharField(max_length=64)
         self.fields['last_name'] = forms.CharField(max_length=64)

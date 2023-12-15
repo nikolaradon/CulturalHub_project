@@ -23,11 +23,19 @@ class UserProfile(models.Model):
 
     @receiver(post_save, sender=User)
     def create_user_profile(sender, instance, created, **kwargs):
+        """
+        A signal triggered when a new User instance is created.
+        Creates a corresponding UserProfile instance for the newly created user.
+        """
         if created:
             UserProfile.objects.create(user=instance)
 
     @receiver(post_save, sender=User)
     def save_user_profile(sender, instance, **kwargs):
+        """
+        A signal triggered when a User instance is saved.
+        Saves the associated UserProfile instance when the user is saved.
+        """
         instance.userprofile.save()
 
     def __str__(self):

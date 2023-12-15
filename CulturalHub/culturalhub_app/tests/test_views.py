@@ -3,6 +3,8 @@ from django import forms
 from django.contrib.auth.models import User
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
+
+from culturalhub_app.forms import UserProfileForm
 from culturalhub_app.models import UserProfile, Category, UserContent
 
 
@@ -107,4 +109,18 @@ def test_content_view_existing_content(client, create_test_category, create_test
     assert 'category' in response.context
     assert response.context['content'] == content1
     assert response.context['category'] == category
+
+
+@pytest.mark.django_db
+def test_user_profile_edit_view_authenticated_owner(client, create_user_profile):
+    user_profile = create_user_profile
+    client.force_login(user_profile.user)
+    response = client.get(reverse('edit-user', kwargs={'user_id': user_profile.user.id}))
+
+    assert response.status_code == 200
+    assert 'form' in response.context
+    assert 'user_profile' in response.context
+    assert isinstance(response.context['form'], UserProfileForm)
+    assert response.context['user_profile'] == user_profile
+
 

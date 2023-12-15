@@ -1,7 +1,8 @@
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
-from django.http import HttpResponseRedirect
-from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import CreateView
 from django.urls import reverse_lazy
@@ -124,28 +125,36 @@ class UserProfileEditView(View, LoginRequiredMixin):
     View responsible for editing a user profile.
     This view requires authentication, meaning that only logged-in users can edit their profiles.
     """
-    def get(self, request):
+    def get(self, request, user_id):
         """
         Handles GET requests, checking if the user is logged in.
         If so, it retrieves the user profile and creates a UserProfileForm filled with profile data and user-related data (first name and last name).
         If the user is not logged in, it redirects them to the login page (login)
+        If the logged-in user is not the owner of the profile, it returns a 403 Forbidden response.
         """
         if request.user.is_authenticated:
-            user_profile = request.user.userprofile
-            form = UserProfileForm(instance=user_profile, initial={'first_name': request.user.first_name, 'last_name': request.user.last_name})
+            user = get_object_or_404(User, id=user_id)
 
-            return render(request, 'user_profile_edit.html', {'user_profile': user_profile, 'form': form})
+            if request.user == user:
+                user_profile = user.userprofile
+                form = UserProfileForm(instance=user_profile,
+                                       initial={'first_name': user.first_name, 'last_name': user.last_name})
+
+                return render(request, 'user_profile_edit.html', {'user_profile': user_profile, 'form': form})
+            else:
+                return HttpResponseForbidden("You do not have permission to edit this profile.")
         else:
             return redirect('login')
 
-    def post(self, request):
+    def post(self, request, user_id):
         """
         Handles POST requests, which are used to save changes made in the profile editing form.
         If the form is valid, it saves the changes to the user profile and redirects them to their profile page.
         If the form is not valid, it re-renders the profile editing page with errors.
         """
         if request.user.is_authenticated:
-            user_profile = request.user.userprofile
+            user = get_object_or_404(User, id=user_id)
+            user_profile = user.userprofile
             form = UserProfileForm(request.POST, instance=user_profile)
 
             if form.is_valid():
@@ -154,7 +163,7 @@ class UserProfileEditView(View, LoginRequiredMixin):
                 request.user.save()
                 form.save()
                 messages.success(request, "Profile has been updated successfully.")
-                return redirect('user', user_id=request.user.id)
+                return redirect('user', user_id=user.id)
             else:
                 return render(request, 'user_profile_edit.html', {'user_profile': user_profile, 'form': form})
         else:
