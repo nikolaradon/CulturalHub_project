@@ -42,7 +42,6 @@ class LoginView(View):
         if form.is_valid():
             user = form.get_user()
             login(request, user)
-            print(f"User {user.username} logged in successfully.")
             return redirect('main-page')
         return render(request, 'login.html', {'form': form})
 
@@ -59,13 +58,8 @@ class RegisterView(CreateView):
 
     def form_valid(self, form):
         """
-        Process a valid form submission.
-
         Overrides the form_valid method to perform additional actions upon successful registration.
         In this case, it adds a success message to the request and calls the parent class's form_valid method.
-
-        :param form: RegistrationForm object.
-        :return: HttpResponse object.
         """
         response = super().form_valid(form)
         messages.success(self.request, "Profile has been successfully created. Please log in.")
@@ -90,7 +84,6 @@ class MainPageView(View):
         Handles GET requests for the main page.
         Retrieves all categories from the database.
         Fetches the current user from the request.
-        Renders the 'main.html' template with the categories and user information.
         """
         categories = Category.objects.all()
         user = request.user
@@ -244,5 +237,5 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
         content.author = self.request.user.userprofile
         content.save()
         category_name = content.category.name
-        return HttpResponseRedirect(reverse_lazy('category', kwargs={'category': category_name}))
+        return redirect('category', category=category_name)
 

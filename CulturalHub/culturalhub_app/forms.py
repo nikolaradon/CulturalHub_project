@@ -56,7 +56,7 @@ class UserProfileForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         """
         Overrides the default __init__ method to include additional fields (first_name and last_name) not present in the UserProfile model.
-        This form is designed to be used in conjunction with the User and UserProfile models for user registration and profile editing.
+        This form is designed to be used in conjunction with the User and UserProfile models for profile editing.
         """
         super().__init__(*args, **kwargs)
         self.fields['first_name'] = forms.CharField(max_length=64)
