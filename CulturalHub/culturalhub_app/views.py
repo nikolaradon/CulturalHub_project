@@ -107,7 +107,22 @@ class UserProfileView(View):
         """
         try:
             user_profile = UserProfile.objects.get(user=user_id)
-            return render(request, 'user_profile.html', {'user_profile': user_profile})
+            contents = UserContent.objects.filter(author=user_profile)
+
+            grouped_contents = {}
+            for content in contents:
+                category = content.category
+                if category not in grouped_contents:
+                    grouped_contents[category] = []
+                grouped_contents[category].append(content)
+
+            ctx = {
+                'user_profile': user_profile,
+                'grouped_contents': grouped_contents
+            }
+
+            return render(request, 'user_profile.html', ctx)
+
         except UserProfile.DoesNotExist:
             messages.error(request, "User profile with this ID doesn't exist!")
             return redirect('main-page')
@@ -238,4 +253,5 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
         content.save()
         category_name = content.category.name
         return redirect('category', category=category_name)
+
 

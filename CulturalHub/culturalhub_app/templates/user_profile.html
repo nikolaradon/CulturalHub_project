@@ -13,6 +13,16 @@
             </ul>
         {% endfor %}
 
+    <h1>Content added by {{ user_profile }}</h1>
+    {% for category, category_contents in grouped_contents.items %}
+        <h2>{{ category }}</h2>
+        <ul>
+            {% for content in category_contents %}
+                <li><a href="{% url 'content-view' content.id %}">{{ content }}</a></li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+
     {% if user.id == user_profile.user.id %}
     <a href="{% url 'edit-user' user_profile.user.id %}">Edit your profile</a><br>
     <a href="{% url 'logout' %}">Logout</a><br>
