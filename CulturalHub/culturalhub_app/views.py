@@ -1,6 +1,7 @@
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
@@ -284,7 +285,14 @@ class EditContentView(LoginRequiredMixin, View):
             return HttpResponseForbidden("You do not have permission to edit this content.")
 
 
-class DeleteContentView(LoginRequiredMixin, View):
-    pass
+class DeleteContentView(LoginRequiredMixin, DeleteView):
+    model = UserContent
+    template_name = reverse_lazy('main-page')
+
+    def get_object(self, queryset=None):
+        obj = super().get_object()
+        if not obj.author == self.request.user.userprofile:
+            raise PermissionDenied("You do not have permission to delete this content.")
+        return obj
     
 
