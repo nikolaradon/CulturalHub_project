@@ -1,13 +1,13 @@
 from django.contrib import messages
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth.models import User
-from django.http import HttpResponseRedirect, HttpResponseForbidden
+from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.views.generic import CreateView
+from django.views.generic import CreateView, DeleteView
 from django.urls import reverse_lazy
 from culturalhub_app.models import UserProfile, Category, UserContent
-from culturalhub_app.forms import RegistrationForm, UserProfileForm
+from culturalhub_app.forms import RegistrationForm, UserProfileForm, ContentEditForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout, login
 
@@ -254,4 +254,37 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
         category_name = content.category.name
         return redirect('category', category=category_name)
 
+
+class EditContentView(LoginRequiredMixin, View):
+    def get(self, request, content_id):
+        try:
+            content = UserContent.objects.get(id=content_id)
+            form = ContentEditForm(instance=content)
+        except UserContent.DoesNotExist:
+            messages.error(request, "Content does not exist")
+            return redirect('main-page')
+
+        if request.user == content.author.user:
+            return render(request, 'edit_content.html', {'content': content, 'form': form})
+        else:
+            return HttpResponseForbidden("You do not have permission to edit this content.")
+
+    def post(self, request, content_id):
+        content = UserContent.objects.get(id=content_id)
+
+        if request.user == content.author.user:
+            form = ContentEditForm(request.POST, instance=content)
+            if form.is_valid():
+                form.save()
+                messages.success(request, "Content has been updated successfully.")
+                return redirect('content-view', content_id)
+            else:
+                return render(request, 'edit_content.html', {'content': content, 'form': form})
+        else:
+            return HttpResponseForbidden("You do not have permission to edit this content.")
+
+
+class DeleteContentView(LoginRequiredMixin, View):
+    pass
+    
 

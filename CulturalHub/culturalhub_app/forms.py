@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.models import User
 from datetime import date
-from .models import UserProfile
+from .models import UserProfile, UserContent
 
 
 class RegistrationForm(UserCreationForm):
@@ -61,5 +61,12 @@ class UserProfileForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.fields['first_name'] = forms.CharField(max_length=64)
         self.fields['last_name'] = forms.CharField(max_length=64)
+
+
+class ContentEditForm(forms.ModelForm):
+    class Meta:
+        model = UserContent
+        exclude = ('author',)
+
 
 
