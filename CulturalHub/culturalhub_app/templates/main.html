@@ -20,4 +20,19 @@
     <input type="text" name="query" placeholder="Search...">
     <button type="submit">Search</button>
 </form>
+        <h1>Welcome to CulturalHub!</h1>
+
+    <h2>Latest Content</h2>
+    {% if latest_content %}
+        <p><a href="{% url 'content-view' latest_content.id %}">{{ latest_content.title }}</a> - {{ latest_content.date }}</p>
+    {% else %}
+        <p>No content available.</p>
+    {% endif %}
+
+    <h2>Top Rated Content</h2>
+    {% if top_rated_content %}
+        <p><a href="{% url 'content-view' top_rated_content.id %}">{{ top_rated_content.title }}</a> - Rating: {{ top_rated_content.rating }}</p>
+    {% else %}
+        <p>No top-rated content available.</p>
+    {% endif %}
 {% endblock %}
