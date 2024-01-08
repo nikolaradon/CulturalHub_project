@@ -48,48 +48,56 @@ Before you begin, ensure you have met the following requirements:
 - Django 4.2
 - Other dependencies (specified in `requirements.txt`)
 
-## Setup Instructions
+## Installation
 
 1. **Clone the Repository:**
    ```bash
    git clone https://github.com/your-username/CulturalHub.git
    cd CulturalHub
+   ```
 
 
 2. **Create a Virtual Environment:**
    ```bash
-    python -m venv venv
+   python -m venv venv
+   ```
 
-  **On windows:**
-  ```bash
-  .\venv\Scripts\activate
+  
+  - **On Windows:**
+     ```
+     .\venv\Scripts\activate
+     ```
 
-  **On macOS/Linux:**
-  ```bash
-  source venv/bin/activate
+   - **On macOS/Linux:**
+     ```
+     source venv/bin/activate
+     ```
 
 3. **Install Dependencies:**
   ```bash
   pip install -r requirements.txt
+   ```
 
 4. **Apply Migrations:**
   ```bash
   python manage.py migrate
+   ```
 
 
 5. **Create a Superuser (Admin):**
   ```bash
   python manage.py createsuperuser
+   ```
 
 6. **Run the Development Server:**
-
   ```bash
   python manage.py runserver
+   ```
 
-Access the Application:
+**Access the Application:**
 Open your web browser and go to http://127.0.0.1:8000/
 
-Access the Admin Panel:
+**Access the Admin Panel:**
 Visit http://127.0.0.1:8000/admin/ and log in with the superuser credentials.
 
 ## Usage
@@ -100,8 +108,8 @@ Use the search functionality to find specific content or users.
 ## Contributing
 If you would like to contribute to the project, please follow these steps:
 
-Fork the repository.
-Create a new branch: git checkout -b feature-name.
-Make your changes and commit them: git commit -m 'Add feature'.
-Push to the branch: git push origin feature-name.
-Submit a pull request.
+1. Fork the repository.
+2. Create a new branch: `git checkout -b feature-name`.
+3. Make your changes and commit them: `git commit -m 'Add feature'`.
+4. Push to the branch: `git push origin feature-name`.
+5. Submit a pull request.
