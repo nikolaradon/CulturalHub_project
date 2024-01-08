@@ -19,7 +19,7 @@ from django.urls import path
 from culturalhub_app.views import (LoginView, RegisterView, MainPageView,
                                    UserProfileView, CategoryContentView, UserProfileEditView,
                                    logout_view, ContentView, ContentCreateView, EditContentView,
-                                   DeleteContentView, AddCommentView)
+                                   DeleteContentView, AddCommentView, SearchResultsView)
 
 
 urlpatterns = [
@@ -36,4 +36,7 @@ urlpatterns = [
     path('content/edit/<int:content_id>', EditContentView.as_view(), name='edit-content'),
     path('content/delete/<int:pk>', DeleteContentView.as_view(), name='content-delete'),
     path('content/add-comment/<int:content_id>/', AddCommentView.as_view(), name='add-comment'),
+    path('search-results/', SearchResultsView.as_view(), name='search-results'),
+
+
 ]

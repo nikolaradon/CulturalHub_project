@@ -5,13 +5,13 @@ from django.core.exceptions import PermissionDenied
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
-from django.views.generic import CreateView, DeleteView
+from django.views.generic import CreateView, DeleteView, TemplateView
 from django.urls import reverse_lazy
 from culturalhub_app.models import UserProfile, Category, UserContent, Comment
 from culturalhub_app.forms import RegistrationForm, UserProfileForm, ContentEditForm, CommentForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout, login
-from django.http import JsonResponse
+from django.db.models import Q
 
 
 # Create your views here.
@@ -314,6 +314,26 @@ class AddCommentView(View):
             comment.commented_content = UserContent.objects.get(id=content_id)
             comment.save()
         return redirect('content-view', content_id=content_id)
+
+
+class SearchResultsView(TemplateView):
+    template_name = 'search_results.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        query = self.request.GET.get('query', '')
+
+        content_results = UserContent.objects.filter(title__icontains=query)
+
+        users_results = User.objects.filter(
+            Q(username__icontains=query) | Q(first_name__icontains=query) | Q(last_name__icontains=query)
+        )
+
+        context['content_results'] = content_results
+        context['users_results'] = users_results
+        context['query'] = query
+
+        return context
 
 
 

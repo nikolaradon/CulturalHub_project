@@ -16,4 +16,8 @@
     {% for category in categories %}
         <a href="{% url 'category' category.name %}">{{ category.name }}</a>
     {% endfor %}
+    <form method="GET" action="{% url 'search-results' %}">
+    <input type="text" name="query" placeholder="Search...">
+    <button type="submit">Search</button>
+</form>
 {% endblock %}
