@@ -23,7 +23,8 @@ Related interests: {% for interest in content.interests.all %}
     <li>{{ interest }}</li>
     </ul>
 {% endfor %}
-    <a href="{% url 'edit-content' content.id %}">Edit content</a><br>
+    <br><a href="{% url 'edit-content' content.id %}">Edit content</a><br>
+    <a href="{% url 'content-delete' pk=content.id %}">Delete Content</a><br>
     <a href="{% url 'category' category.name %}">Back to {{ category.name }} category</a><br>
     <a href="{% url 'main-page' %}">Back to the main page </a>
 

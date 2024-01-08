@@ -287,12 +287,15 @@ class EditContentView(LoginRequiredMixin, View):
 
 class DeleteContentView(LoginRequiredMixin, DeleteView):
     model = UserContent
-    template_name = reverse_lazy('main-page')
+    template_name = 'content_confirm_delete.html'
+    success_url = reverse_lazy('main-page')
 
-    def get_object(self, queryset=None):
-        obj = super().get_object()
-        if not obj.author == self.request.user.userprofile:
-            raise PermissionDenied("You do not have permission to delete this content.")
-        return obj
+    def delete(self, request, *args, **kwargs):
+        obj = self.get_object()
+        if obj and obj.author == self.request.user.userprofile:
+            return super().delete(request, *args, **kwargs)
+        else:
+            messages.error(request, "You do not have permission to delete this content.")
+            return redirect('main-page')
     
 
