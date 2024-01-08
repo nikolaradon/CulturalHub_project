@@ -7,10 +7,11 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.views import View
 from django.views.generic import CreateView, DeleteView
 from django.urls import reverse_lazy
-from culturalhub_app.models import UserProfile, Category, UserContent
-from culturalhub_app.forms import RegistrationForm, UserProfileForm, ContentEditForm
+from culturalhub_app.models import UserProfile, Category, UserContent, Comment
+from culturalhub_app.forms import RegistrationForm, UserProfileForm, ContentEditForm, CommentForm
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth import logout, login
+from django.http import JsonResponse
 
 
 # Create your views here.
@@ -221,10 +222,15 @@ class ContentView(View):
         try:
             content = UserContent.objects.get(id=content_id)
             category = content.category
+            comments = Comment.objects.filter(commented_content=content)
+
+            form = CommentForm()
 
             ctx = {
                 'content': content,
-                'category': category
+                'category': category,
+                'comments': comments,
+                'form': form
             }
             return render(request, 'content.html', ctx)
         except UserContent.DoesNotExist:
@@ -297,5 +303,18 @@ class DeleteContentView(LoginRequiredMixin, DeleteView):
         else:
             messages.error(request, "You do not have permission to delete this content.")
             return redirect('main-page')
-    
+
+
+class AddCommentView(View):
+    def post(self, request, content_id):
+        form = CommentForm(request.POST)
+        if form.is_valid():
+            comment = form.save(commit=False)
+            comment.user = request.user.userprofile
+            comment.commented_content = UserContent.objects.get(id=content_id)
+            comment.save()
+            return JsonResponse({'success': True, 'comment_text': comment.text})
+        return JsonResponse({'success': False, 'errors': form.errors})
+
+
 
