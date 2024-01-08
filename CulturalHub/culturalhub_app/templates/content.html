@@ -31,7 +31,7 @@ Related interests: {% for interest in content.interests.all %}
 <form method="post" action="{% url 'add-comment' content.id %}">
     {% csrf_token %}
     {{ form.as_p }}
-    <button type="submit" id=add-comment-button">Add comment</button>
+    <button type="submit" id="add-comment-button">Add comment</button>
 </form>
 
 <div>
@@ -42,5 +42,3 @@ Related interests: {% for interest in content.interests.all %}
 </div>
 
 {% endblock %}
-
-{% block body_class %}comment-page{% endblock %}

@@ -313,8 +313,8 @@ class AddCommentView(View):
             comment.user = request.user.userprofile
             comment.commented_content = UserContent.objects.get(id=content_id)
             comment.save()
-            return JsonResponse({'success': True, 'comment_text': comment.text})
-        return JsonResponse({'success': False, 'errors': form.errors})
+        return redirect('content-view', content_id=content_id)
+
 
 
 
