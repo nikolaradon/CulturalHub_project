@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <h1>Delete Content</h1>
+  <p>Are you sure you want to delete the content "{{ object.title }}"?</p>
+
+  <form method="post" action="{% url 'content-delete' pk=object.pk %}">
+    {% csrf_token %}
+    <input type="submit" value="Confirm Delete">
+  </form>
+
+  <a href="{% url 'content-view' content_id=object.pk %}">Cancel</a>
+{% endblock %}

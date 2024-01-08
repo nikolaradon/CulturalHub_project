@@ -16,7 +16,27 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from culturalhub_app.views import (LoginView, RegisterView, MainPageView,
+                                   UserProfileView, CategoryContentView, UserProfileEditView,
+                                   logout_view, ContentView, ContentCreateView, EditContentView,
+                                   DeleteContentView, AddCommentView, SearchResultsView)
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('login/', LoginView.as_view(), name='login'),
+    path('register/', RegisterView.as_view(), name='register'),
+    path('main/', MainPageView.as_view(), name='main-page'),
+    path('user/<int:user_id>/', UserProfileView.as_view(), name='user'),
+    path('category/<str:category>',CategoryContentView.as_view(), name='category'),
+    path('edit/user/<int:user_id>', UserProfileEditView.as_view(), name='edit-user'),
+    path('logout/', logout_view, name='logout'),
+    path('content/<int:content_id>/', ContentView.as_view(), name='content-view'),
+    path('content/create/', ContentCreateView.as_view(), name='create-content'),
+    path('content/edit/<int:content_id>', EditContentView.as_view(), name='edit-content'),
+    path('content/delete/<int:pk>', DeleteContentView.as_view(), name='content-delete'),
+    path('content/add-comment/<int:content_id>/', AddCommentView.as_view(), name='add-comment'),
+    path('search-results/', SearchResultsView.as_view(), name='search-results'),
+
+
 ]

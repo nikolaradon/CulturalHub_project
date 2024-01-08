@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h1>{{ content.title }}</h1>
+<p>Description: {{ content.description }}</p>
+    {% if content.category.name == 'Event' %}
+        <p>Date of event: {{ content.date }}</p>
+    {% else %}
+        <p>Date of creation: {{ content.date }}</p>
+    {% endif %}
+<p>Location: {{ content.location }}</p>
+<p>Author: {{ content.author }}</p>
+<p>Rating: {% if content.rating is None %}
+                 -
+            {% else %}
+                {{ content.rating }}
+            {% endif %}
+</p>
+<p>Culture: {{ content.culture }}</p>
+Related interests: {% for interest in content.interests.all %}
+    <ul>
+    <li>{{ interest }}</li>
+    </ul>
+{% endfor %}
+    <br><a href="{% url 'edit-content' content.id %}">Edit content</a><br>
+    <a href="{% url 'content-delete' pk=content.id %}">Delete Content</a><br>
+    <a href="{% url 'category' category.name %}">Back to {{ category.name }} category</a><br>
+    <a href="{% url 'main-page' %}">Back to the main page </a>
+
+<form method="post" action="{% url 'add-comment' content.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" id="add-comment-button">Add comment</button>
+</form>
+
+<div>
+    <h3>Comments:</h3>
+    {% for comment in comments %}
+        <p>{{ comment.user.user.username }} - {{ comment.created_at }}<br>{{ comment.text }}</p>
+    {% endfor %}
+</div>
+
+{% endblock %}
