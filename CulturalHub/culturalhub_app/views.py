@@ -267,7 +267,13 @@ class ContentCreateView(LoginRequiredMixin, CreateView):
 
 
 class EditContentView(LoginRequiredMixin, View):
+    """
+    View for editing content.
+    """
     def get(self, request, content_id):
+        """
+        Handles GET requests for editing content.
+        """
         try:
             content = UserContent.objects.get(id=content_id)
             form = ContentEditForm(instance=content)
@@ -281,6 +287,9 @@ class EditContentView(LoginRequiredMixin, View):
             return HttpResponseForbidden("You do not have permission to edit this content.")
 
     def post(self, request, content_id):
+        """
+        Handles POST requests to save changes made in the content editing form.
+        """
         content = UserContent.objects.get(id=content_id)
 
         if request.user == content.author.user:
@@ -296,11 +305,17 @@ class EditContentView(LoginRequiredMixin, View):
 
 
 class DeleteContentView(LoginRequiredMixin, DeleteView):
+    """
+    View for deleting content.
+    """
     model = UserContent
     template_name = 'content_confirm_delete.html'
     success_url = reverse_lazy('main-page')
 
     def delete(self, request, *args, **kwargs):
+        """
+        Deletes the content object if the logged-in user is the owner.
+        """
         obj = self.get_object()
         if obj and obj.author == self.request.user.userprofile:
             return super().delete(request, *args, **kwargs)
@@ -310,7 +325,13 @@ class DeleteContentView(LoginRequiredMixin, DeleteView):
 
 
 class AddCommentView(View):
+    """
+     View for adding comments.
+    """
     def post(self, request, content_id):
+        """
+        Handles POST requests to add comments to content.
+        """
         form = CommentForm(request.POST)
         if form.is_valid():
             comment = form.save(commit=False)
@@ -321,9 +342,15 @@ class AddCommentView(View):
 
 
 class SearchResultsView(TemplateView):
+    """
+    View for displaying search results.
+    """
     template_name = 'search_results.html'
 
     def get_context_data(self, **kwargs):
+        """
+         Gets context data for displaying search results.
+        """
         context = super().get_context_data(**kwargs)
         query = self.request.GET.get('query', '')
 
