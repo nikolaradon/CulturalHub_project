@@ -89,8 +89,8 @@ class MainPageView(View):
         """
         categories = Category.objects.all()
         user = request.user
-        latest_content = UserContent.objects.order_by('-date').first()
-        top_rated_content = UserContent.objects.order_by('-rating').first()
+        latest_content = UserContent.objects.exclude(rating=None).order_by('-date').first()
+        top_rated_content = UserContent.objects.exclude(rating=None).order_by('-rating').first()
         ctx = {
             'categories': categories,
             'user': user,
