@@ -38,7 +38,7 @@ CulturalHub aims to connect individuals with diverse cultural interests by provi
 
 - **HTML/CSS:** Frontend development for the user interface.
 
-- **SQLite:** Database management.
+- **PostgreSQL:** Database management.
 
 ## Prerequisites
 
